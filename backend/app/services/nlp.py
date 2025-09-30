@@ -1,5 +1,5 @@
 
-import spacy
+import spacy # type: ignore
 from typing import List, Dict, Any
 
 # Load the spaCy model for NLP tasks
