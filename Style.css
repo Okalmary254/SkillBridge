@@ -1,11 +1,11 @@
 :root {
-    --primary-color: Dark black;
-    --secondary-color: Emerald green;
-    --background-color: Dark gray ;
-    --card-bg: White;
-    --gap-color: Gold; 
-    --font-color: Very Dark gray;
-    --match-color: Teal;
+    --primary-color: teal;
+    --secondary-color: #6a9273;
+    --background-color: grey;
+    --card-bg: white;
+    --gap-color:gold; 
+    --font-color:dark grey;
+    --match-color: Cyan; 
 }
 
 body {
@@ -62,7 +62,7 @@ header h1 { margin: 0; }
 /* Resume Analyzer Output Component Style */
 #job-recommendations-output {
     margin-top: 15px;
-    border-top: 1px solid white;
+    border-top: 1px solid #eee;
     padding-top: 10px;
 }
 .job-match-item {
@@ -92,7 +92,7 @@ header h1 { margin: 0; }
     padding: 10px;
     margin-top: 10px;
     border-radius: 4px;
-    border: 1px solid gainsboro;
+    border: 1px solid #ccc;
     width: 100%;
     box-sizing: border-box;
 }
@@ -129,7 +129,7 @@ button:hover {
 }
 
 
-/* Interactive Skill Tags Component Style */
+/* Interactive Skill Tags Component */
 .tag-container {
     display: flex;
     flex-wrap: wrap;
@@ -152,7 +152,7 @@ button:hover {
 
 /* Progress Bar Component (Gamification) */
 .progress-bar-container {
-    background-color:gainsboro;
+    background-color: whitesmoke;
     border-radius: 5px;
     margin: 15px 0;
     height: 30px;
@@ -187,7 +187,7 @@ button:hover {
 
 /* Recommendation Card Component Style */
 .rec-item {
-    border: 1px solid wheat;
+    border: 1px solid whitesmoke;
     padding: 15px;
     margin-bottom: 10px;
     border-left: 5px solid var(--primary-color);
@@ -202,6 +202,7 @@ button:hover {
     padding: 8px 15px;
     border-radius: 5px;
 }
+
 
 
 @media (max-width: 900px) {
