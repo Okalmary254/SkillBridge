@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { getProfile, getJobData, getRecommendations } from '../../services/api';
 import Loader from '../../components/Loader';
 import { Link } from 'react-router-dom';
 
@@ -12,25 +12,42 @@ const Dashboard = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError('');
-            try {
-                const [profileRes, jobRes, recRes] = await Promise.all([
-                    axios.get('/api/profile/profile'),
-                    axios.get('/api/jobdata'),
-                    axios.get('/api/recommendations'),
-                ]);
-                setProfile(profileRes.data);
-                setJobData(jobRes.data);
-                setRecommendations(recRes.data);
-            } catch (err) {
-                setError('Failed to load dashboard data.');
-            } finally {
+        let isMounted = true;
+        setLoading(true);
+        setError('');
+        let loaded = 0;
+        let tempProfile = null, tempJobData = [], tempRecommendations = [];
+
+        const handleDone = () => {
+            loaded++;
+            if (loaded === 3 && isMounted) {
+                setProfile(tempProfile);
+                setJobData(tempJobData);
+                setRecommendations(tempRecommendations);
                 setLoading(false);
+                if (!tempProfile && !tempJobData.length && !tempRecommendations.length) {
+                    setError('Failed to load dashboard data.');
+                }
             }
         };
-        fetchData();
+
+
+        getProfile()
+            .then(res => { tempProfile = res.data; })
+            .catch(() => { tempProfile = null; })
+            .finally(handleDone);
+
+        getJobData()
+            .then(res => { tempJobData = res.data; })
+            .catch(() => { tempJobData = []; })
+            .finally(handleDone);
+
+        getRecommendations()
+            .then(res => { tempRecommendations = res.data; })
+            .catch(() => { tempRecommendations = []; })
+            .finally(handleDone);
+
+        return () => { isMounted = false; };
     }, []);
 
     if (loading) return <Loader text="Loading dashboard..." />;
@@ -53,17 +70,25 @@ const Dashboard = () => {
                 {/* Recommendations */}
                 <div className="bg-green-50 p-4 rounded shadow-sm">
                     <h3 className="text-xl font-semibold mb-2">Skill Recommendations</h3>
-                    {recommendations.length === 0 ? (
-                        <div>No recommendations at this time.</div>
-                    ) : (
-                        <ul className="list-disc ml-6">
-                            {recommendations.map((rec, idx) => (
-                                <li key={idx}>
-                                    <span className="font-medium">{rec.skill}:</span> <a href={rec.resource} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">Resource</a>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    {(() => {
+                        console.log('Recommendations:', recommendations);
+                        if (!Array.isArray(recommendations)) {
+                            return <div className="text-red-600">Error: Recommendations data is invalid.</div>;
+                        }
+                        if (recommendations.length === 0) {
+                            return <div>No recommendations at this time.</div>;
+                        }
+                        return (
+                            <ul className="list-disc ml-6">
+                                {recommendations.map((rec, idx) => (
+                                    <li key={idx}>
+                                        <span className="font-medium">{rec.skill}:</span>{' '}
+                                        <a href={rec.resource} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">Resource</a>
+                                    </li>
+                                ))}
+                            </ul>
+                        );
+                    })()}
                 </div>
             </div>
             {/* Job Data Section */}

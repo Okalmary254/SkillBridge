@@ -1,22 +1,47 @@
+// Upload avatar image
+export const uploadAvatar = (formData) => {
+  // POST /api/avatar/upload_avatar
+  return api.post('/api/avatar/upload_avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+// Change user password
+export const changePassword = (passwordData) => {
+  // POST /api/password/change_password
+  return api.post('/api/password/change_password', passwordData);
+};
 import axios from 'axios';
+
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
+
+// Add a request interceptor to include JWT token if present
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 
 // ------------------- PROFILE & AUTH -------------------
 
 // Register a new user (Signup)
 export const registerUser = (userData) => {
-  // POST /api/profile/profile (custom, for demo)
-  return api.post('/api/profile/profile', userData);
+  // POST /api/auth/register
+  return api.post('/api/auth/register', userData);
 };
 
-// Login user (simulate, for demo)
+// Login user
 export const loginUser = (credentials) => {
-  // POST /api/profile/login (not implemented in backend, placeholder)
-  return api.post('/api/profile/login', credentials);
+  // POST /api/auth/login
+  return api.post('/api/auth/login', credentials);
 };
 
 // Get user profile
@@ -47,6 +72,18 @@ export const uploadResume = (formData) => {
 export const addSkills = (skills) => {
   // POST /api/profile/skills
   return api.post('/api/profile/skills', { skills });
+};
+
+// Get all skills for the current user
+export const getSkills = () => {
+  // GET /api/profile/profile (skills are part of profile)
+  return api.get('/api/profile/profile').then(res => res.data.skills);
+};
+
+// Remove a skill for the current user
+export const removeSkill = (skill) => {
+  // DELETE /api/profile/skills
+  return api.delete('/api/profile/skills', { data: { skill } });
 };
 
 // ------------------- JOB DATA -------------------

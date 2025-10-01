@@ -6,6 +6,20 @@ from app.routes.jobdata import get_job_data
 
 recommend_bp = Blueprint('recommend', __name__)
 
+@recommend_bp.route('/api/recommendations', methods=['GET'])
+def get_recommendations_default():
+    """
+    Return default/sample recommendations for GET requests.
+    """
+    recommendations = [
+        {"skill": "Flask", "resource": "Flask Mega Tutorial"},
+        {"skill": "React", "resource": "React Docs Tutorial"},
+        {"skill": "Django", "resource": "Django Official Tutorial"},
+        {"skill": "Vue.js", "resource": "Vue.js Guide"},
+        {"skill": "Angular", "resource": "Angular Tutorial"}
+    ]
+    return jsonify(recommendations)
+
 @recommend_bp.route('/api/recommendations', methods=['POST'])
 def get_recommendations():
     """

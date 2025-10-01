@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { loginUser } from '../../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,15 +20,14 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      // Simulate backend login (replace with real API call)
-      // In a real app, you'd get a token and store it securely
-      const res = await axios.post('/api/profile/login', {
+      // Login user with real API
+      const res = await loginUser({
         email: form.email,
         password: form.password,
       });
-      // Simulate storing token/user info
-      localStorage.setItem('user', JSON.stringify(res.data));
-      navigate('/dashboard');
+      // Store only the token
+      localStorage.setItem('token', res.data.token);
+      navigate('/profile');
     } catch (err) {
       setError(
         err.response?.data?.message || 'Login failed. Please check your credentials.'

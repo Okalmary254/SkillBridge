@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { registerUser, loginUser } from '../../services/api';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -30,16 +30,28 @@ const Signup = () => {
     }
     setLoading(true);
     try {
-      // Simulate backend registration (replace with real API call)
-      await axios.post('/api/profile/profile', {
-        name: form.name,
+      // Register user with all details in the database
+      const res = await registerUser({
+        username: form.name,
         email: form.email,
+        password: form.password,
         location: form.location,
         bio: form.bio,
-        password: form.password, // In real app, handle securely
       });
+      // After successful registration, log in the user to get JWT
+      try {
+        const loginRes = await loginUser({
+          email: form.email,
+          password: form.password,
+        });
+        localStorage.setItem('token', loginRes.data.token);
+      } catch (loginErr) {
+        setError('Registration succeeded but automatic login failed. Please log in manually.');
+        setLoading(false);
+        return;
+      }
       setSuccess(true);
-      setTimeout(() => navigate('/login'), 1500);
+      navigate('/profile');
     } catch (err) {
       setError(
         err.response?.data?.message || 'Registration failed. Please try again.'

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { getProfile, updateProfile, deleteProfile } from '../../services/api';
+import EditProfile from './EditProfile';
 import Loader from '../../components/Loader';
+import Sidebar from '../../components/Sidebar';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -16,7 +18,7 @@ const Profile = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get('/api/profile/profile');
+        const res = await getProfile();
         setProfile(res.data);
         setForm(res.data);
       } catch (err) {
@@ -32,19 +34,31 @@ const Profile = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleEdit = () => setEditMode(true);
+  // Helper for safe JSON parse
+  const safeJsonParse = (val, fallback) => {
+    try {
+      return JSON.parse(val);
+    } catch {
+      return fallback;
+    }
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+  };
   const handleCancel = () => {
     setEditMode(false);
     setForm(profile);
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleSave = async (updatedForm) => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.put('/api/profile/profile', form);
-      setProfile(res.data.profile);
+      const res = await updateProfile(updatedForm);
+      // Re-fetch profile to ensure latest data (name, skills, etc)
+      const fresh = await getProfile();
+      setProfile(fresh.data);
       setEditMode(false);
     } catch (err) {
       setError('Failed to update profile.');
@@ -58,7 +72,7 @@ const Profile = () => {
     setLoading(true);
     setError('');
     try {
-      await axios.delete('/api/profile/profile');
+      await deleteProfile();
       localStorage.removeItem('user');
       navigate('/signup');
     } catch (err) {
@@ -73,135 +87,81 @@ const Profile = () => {
   if (!profile) return null;
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-4">My Profile</h2>
-      {editMode ? (
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-medium">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name || ''}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              required
-            />
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main className="flex-1 ml-64 p-10 bg-gray-50">
+        <div>
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-32 h-32 rounded-full bg-gray-200 overflow-hidden mb-4 border-4 border-blue-200">
+              {/* Show avatar image if available, else show initials */}
+              {profile.image_url ? (
+                <img
+                  src={profile.image_url}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src={'https://ui-avatars.com/api/?name=' + encodeURIComponent(profile.name || 'User') + '&background=0D8ABC&color=fff&size=128'}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+            <h2 className="text-3xl font-bold mb-2 text-center">{profile.name}</h2>
+            <div className="text-gray-600 text-center">{profile.email}</div>
           </div>
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email || ''}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Location</label>
-            <input
-              type="text"
-              name="location"
-              value={form.location || ''}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Bio</label>
-            <textarea
-              name="bio"
-              value={form.bio || ''}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded"
-              rows={3}
-            />
-          </div>
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
-              disabled={loading}
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded font-semibold hover:bg-gray-400 transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-3">
-          <div>
-            <span className="font-medium">Name:</span> {profile.name}
-          </div>
-          <div>
-            <span className="font-medium">Email:</span> {profile.email}
-          </div>
-          <div>
-            <span className="font-medium">Location:</span> {profile.location}
-          </div>
-          <div>
-            <span className="font-medium">Bio:</span> {profile.bio}
-          </div>
-          <div>
-            <span className="font-medium">Skills:</span> {profile.skills?.join(', ') || 'N/A'}
-          </div>
-          <div>
-            <span className="font-medium">Education:</span>
-            <ul className="list-disc ml-6">
-              {profile.education?.map((edu, idx) => (
-                <li key={idx}>
-                  {edu.degree} - {edu.institution} ({edu.year})
-                </li>
-              )) || <li>N/A</li>}
-            </ul>
-          </div>
-          <div>
-            <span className="font-medium">Experience:</span>
-            <ul className="list-disc ml-6">
-              {profile.experience?.map((exp, idx) => (
-                <li key={idx}>
-                  {exp.title} at {exp.company} ({exp.years})
-                </li>
-              )) || <li>N/A</li>}
-            </ul>
-          </div>
-          {profile.resume_url && (
-            <div>
-              <span className="font-medium">Resume:</span>{' '}
-              <a
-                href={profile.resume_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                View Resume
-              </a>
+          {editMode ? (
+            <EditProfile profile={profile} onSave={handleSave} onCancel={handleCancel} />
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-50 rounded p-4 shadow">
+                  <div className="font-semibold mb-2">Profile Info</div>
+                  <div><span className="font-medium">Name:</span> {profile.name}</div>
+                  <div><span className="font-medium">Email:</span> {profile.email}</div>
+                  <div><span className="font-medium">Location:</span> {profile.location}</div>
+                  <div><span className="font-medium">Bio:</span> {profile.bio}</div>
+                </div>
+                <div className="bg-gray-50 rounded p-4 shadow">
+                  <div className="font-semibold mb-2">Skills</div>
+                  <ul className="list-disc ml-6">
+                    {profile.skills?.map((skill, idx) => <li key={idx}>{skill}</li>) || <li>N/A</li>}
+                  </ul>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gray-50 rounded p-4 shadow">
+                  <div className="font-semibold mb-2">Education</div>
+                  <ul className="list-disc ml-6">
+                    {profile.education?.map((edu, idx) => (
+                      <li key={idx}>{edu.degree} - {edu.institution} ({edu.year})</li>
+                    )) || <li>N/A</li>}
+                  </ul>
+                </div>
+                <div className="bg-gray-50 rounded p-4 shadow">
+                  <div className="font-semibold mb-2">Experience</div>
+                  <ul className="list-disc ml-6">
+                    {profile.experience?.map((exp, idx) => (
+                      <li key={idx}>{exp.title} at {exp.company} ({exp.years})</li>
+                    )) || <li>N/A</li>}
+                  </ul>
+                </div>
+              </div>
+              {profile.resume_url && (
+                <div className="bg-gray-50 rounded p-4 shadow">
+                  <span className="font-medium">Resume:</span>{' '}
+                  <a href={profile.resume_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Resume</a>
+                </div>
+              )}
+              <div className="flex gap-4 mt-4">
+                <button onClick={handleEdit} className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition">Edit Profile</button>
+                <button onClick={handleDelete} className="bg-red-600 text-white px-4 py-2 rounded font-semibold hover:bg-red-700 transition">Delete Profile</button>
+              </div>
             </div>
           )}
-          <div className="flex gap-4 mt-4">
-            <button
-              onClick={handleEdit}
-              className="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700 transition"
-            >
-              Edit Profile
-            </button>
-            <button
-              onClick={handleDelete}
-              className="bg-red-600 text-white px-4 py-2 rounded font-semibold hover:bg-red-700 transition"
-            >
-              Delete Profile
-            </button>
-          </div>
         </div>
-      )}
+      </main>
     </div>
   );
 };
