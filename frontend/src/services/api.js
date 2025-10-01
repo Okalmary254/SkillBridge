@@ -6,20 +6,20 @@ const api = axios.create({
 
 // Function to upload a resume
 export const uploadResume = (formData) => {
-  return api.post('/profile/upload', formData);
+  return api.post('/api/profile/upload', formData);
 };
 
 // Function to add manual skills
 export const addSkills = (skills) => {
-  return api.post('/profile/skills', { skills });
+  return api.post('/api/profile/skills', { skills });
 };
 
 // Function to analyze skill gaps
 export const analyzeGap = () => {
-  return api.get('/gap/analyze');
+  return api.get('/api/gap/analyze');
 };
 
 // Function to get learning recommendations
 export const getRecommendations = () => {
-  return api.get('/recommendations');
+  return api.get('/api/recommendations');
 };

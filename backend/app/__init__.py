@@ -11,7 +11,7 @@ def create_app():
 
     # Register blueprints
     from .routes import profile, jobdata, gap, recommend
-    app.register_blueprint(profile.profile_bp)
+    app.register_blueprint(profile.profile_bp, url_prefix='/api/profile')
     app.register_blueprint(jobdata.jobdata_bp)
     app.register_blueprint(gap.gap_bp)
     app.register_blueprint(recommend.recommend_bp)
