@@ -1,5 +1,6 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import "../styles/UploadResume.css";
 
 export default function UploadResume() {

@@ -1,7 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import "../styles/AuthPage.css";
 
 export default function AuthPage() {
@@ -10,6 +10,15 @@ export default function AuthPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Auto-redirect if user already authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("username");
+    if (token && user) {
+      navigate("/profile"); // persistent login redirect
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,29 +44,32 @@ export default function AuthPage() {
 
       const userData = res.data.user || res.data;
 
-      // Store user info in localStorage
+      // Store persistent user info in localStorage
+      const userObj = {
+        id: userData.id || "",
+        username: userData.username || userData.name || "",
+        email: userData.email || form.email,
+      };
+
       localStorage.setItem("token", res.data.token || "");
-      localStorage.setItem("userId", userData.id || "");
-      localStorage.setItem("username", userData.username || userData.name || "");
-      localStorage.setItem("email", userData.email || form.email);
+      localStorage.setItem("user", JSON.stringify(userObj));
 
       setMessage(
         isLogin
-          ? `Welcome back, ${userData.username || userData.name || "User"}!`
+          ? `Welcome back, ${userObj.username || "User"}!`
           : "Registration successful! Redirecting to your profile..."
       );
 
-      // Redirect after successful login/signup
+      // Redirect after success
       setTimeout(() => navigate("/profile"), 1200);
-    } catch (err) {
-      console.error("Error:", err.response?.data || err.message);
 
+    } catch (err) {
+      console.error("Auth error:", err.response?.data || err.message);
       if (err.response?.status === 409)
         setMessage("User already exists. Try logging in instead.");
       else if (err.response?.status === 401)
         setMessage("Invalid email or password.");
-      else
-        setMessage("Something went wrong. Please try again.");
+      else setMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -66,7 +78,7 @@ export default function AuthPage() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Toggle between login/register */}
+        {/* Toggle login/register */}
         <div className="toggle-buttons">
           <button
             onClick={() => setIsLogin(false)}

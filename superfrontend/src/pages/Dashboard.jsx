@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Home, Target, BookOpen } from "lucide-react";
-import axios from "axios";
+import axios from "../axiosConfig";
 
 const Dashboard = () => {
   const navigate = useNavigate();

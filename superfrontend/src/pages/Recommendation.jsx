@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { Loader2, ArrowRight, Brain, Sparkles } from "lucide-react";
 import "../styles/Recommendation.css";
 

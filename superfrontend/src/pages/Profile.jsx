@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { useNavigate, Link } from "react-router-dom";
 import { Home, Target, BookOpen, User, LogOut } from "lucide-react";
 import "../styles/Profile.css";

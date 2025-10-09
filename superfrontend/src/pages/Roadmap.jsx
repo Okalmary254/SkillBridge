@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { Link, useNavigate } from "react-router-dom";
 import { Home, User, BookOpen, LayoutDashboard } from "lucide-react";
 import "../styles/Roadmap.css";

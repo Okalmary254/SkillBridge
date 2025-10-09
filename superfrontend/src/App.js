@@ -9,6 +9,7 @@ import Roadmap from "./pages/Roadmap";
 import Skills from "./pages/Skills";
 import Profile from "./pages/Profile";
 import Recommendation from "./pages/Recommendation";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -37,6 +38,9 @@ function App() {
 
         {/* Recommendations */}
         <Route path="/recommendation" element={<Recommendation />} />
+
+        {/* Protected Routes Example */}
+        <Route path="/protected" element={<ProtectedRoute />} />
       </Routes>
     </Router>
   );
