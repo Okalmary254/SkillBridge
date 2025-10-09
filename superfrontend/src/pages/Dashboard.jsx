@@ -50,9 +50,9 @@ const Dashboard = () => {
             <User size={18} />
             <span>Dashboard</span>
           </Link>
-          <Link to="/roadmaps" className="nav-item">
+          <Link to="/roadmap" className="nav-item">
             <Target size={18} />
-            <span>Roadmaps</span>
+            <span>Roadmap</span>
           </Link>
           <Link to="/skills" className="nav-item">
             <BookOpen size={18} />
