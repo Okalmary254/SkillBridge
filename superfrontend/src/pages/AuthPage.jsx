@@ -1,21 +1,72 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/AuthPage.css"; 
+import "../styles/AuthPage.css";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isLogin ? "/api/auth/login" : "/api/auth/register";
-    const res = await axios.post(url, form);
-    console.log(res.data);
+    setLoading(true);
+    setMessage("");
+
+    try {
+      // Prepare payload
+      const payload = isLogin
+        ? { email: form.email, password: form.password }
+        : { username: form.username, email: form.email, password: form.password };
+
+      // API endpoint
+      const url = isLogin
+        ? "http://127.0.0.1:5000/api/auth/login"
+        : "http://127.0.0.1:5000/api/auth/register";
+
+      // Send request
+      const res = await axios.post(url, payload, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
+
+      const userData = res.data.user || res.data;
+
+      // Store user info in localStorage
+      localStorage.setItem("token", res.data.token || "");
+      localStorage.setItem("userId", userData.id || "");
+      localStorage.setItem("username", userData.username || userData.name || "");
+      localStorage.setItem("email", userData.email || form.email);
+
+      setMessage(
+        isLogin
+          ? `Welcome back, ${userData.username || userData.name || "User"}!`
+          : "Registration successful! Redirecting to your profile..."
+      );
+
+      // Redirect after successful login/signup
+      setTimeout(() => navigate("/profile"), 1200);
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
+
+      if (err.response?.status === 409)
+        setMessage("User already exists. Try logging in instead.");
+      else if (err.response?.status === 401)
+        setMessage("Invalid email or password.");
+      else
+        setMessage("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
+        {/* Toggle between login/register */}
         <div className="toggle-buttons">
           <button
             onClick={() => setIsLogin(false)}
@@ -35,31 +86,40 @@ export default function AuthPage() {
         <p>
           {isLogin
             ? "Log in to continue your journey"
-            : "Start your learning journey today"}
+            : "Start your learning adventure today"}
         </p>
 
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <input
               type="text"
-              placeholder="Name"
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Username"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              required
             />
           )}
           <input
             type="email"
             placeholder="Email address"
+            value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
           />
           <input
             type="password"
             placeholder="Password"
+            value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
           />
-          <button type="submit">
-            {isLogin ? "Log In" : "Sign Up"}
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Processing..." : isLogin ? "Log In" : "Sign Up"}
           </button>
         </form>
+
+        {message && <p className="auth-message">{message}</p>}
       </div>
     </div>
   );

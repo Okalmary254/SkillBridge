@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { Home, User, BookOpen, LayoutDashboard } from "lucide-react";
 import "../styles/Roadmap.css";
 
 const Roadmap = () => {
@@ -7,6 +9,7 @@ const Roadmap = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const userId = localStorage.getItem("userId"); // stored at login
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRoadmap = async () => {
@@ -30,7 +33,8 @@ const Roadmap = () => {
     fetchRoadmap();
   }, [userId]);
 
-  // Loading state
+  const handleProfileClick = () => navigate("/profile");
+
   if (loading) {
     return (
       <div className="roadmap-loading">
@@ -40,28 +44,52 @@ const Roadmap = () => {
     );
   }
 
-  // Error state
   if (error) {
     return <p className="error">{error}</p>;
   }
 
-  // No data
   if (!roadmap) {
     return <p className="no-data">No roadmap available. Upload a resume to generate one!</p>;
   }
 
-  // Destructure backend response
   const { completedSkills = [], currentStage, upcomingSkills = [], progress = 0 } = roadmap;
 
   return (
     <div className="roadmap-container">
-      {/* Header */}
+      {/* ===== Navbar ===== */}
+      <header className="navbar">
+        <div className="logo">
+          <div className="dot"></div>
+          <h1>SkillBridge</h1>
+        </div>
+
+        <nav className="nav-links">
+          <Link to="/" className="nav-item">
+            <Home size={18} />
+            <span>Home</span>
+          </Link>
+          <Link to="/dashboard" className="nav-item">
+            <LayoutDashboard size={18} />
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/skills" className="nav-item">
+            <BookOpen size={18} />
+            <span>Skills</span>
+          </Link>
+        </nav>
+
+        <div className="profile-icon" onClick={handleProfileClick} title="View Profile">
+          <User size={24} className="icon-hover" />
+        </div>
+      </header>
+
+      {/* ===== Header ===== */}
       <header className="roadmap-header">
         <h2>Your Learning Roadmap</h2>
         <p className="subtitle">Track your learning journey and progress.</p>
       </header>
 
-      {/* Progress Overview */}
+      {/* ===== Progress Overview ===== */}
       <section className="progress-section">
         <h3>Overall Progress</h3>
         <div className="progress-bar">
@@ -73,7 +101,7 @@ const Roadmap = () => {
         <p>{progress}% completed</p>
       </section>
 
-      {/* Current Stage */}
+      {/* ===== Current Stage ===== */}
       <section className="current-stage">
         <h3>Current Stage</h3>
         {currentStage ? (
@@ -87,7 +115,7 @@ const Roadmap = () => {
         )}
       </section>
 
-      {/* Completed Skills */}
+      {/* ===== Completed Skills ===== */}
       <section className="completed-section">
         <h3>Completed Skills</h3>
         {completedSkills.length > 0 ? (
@@ -101,7 +129,7 @@ const Roadmap = () => {
         )}
       </section>
 
-      {/* Upcoming Skills */}
+      {/* ===== Upcoming Skills ===== */}
       <section className="upcoming-section">
         <h3>Upcoming Skills</h3>
         {upcomingSkills.length > 0 ? (
@@ -111,11 +139,11 @@ const Roadmap = () => {
             ))}
           </ul>
         ) : (
-          <p>You're all caught up! 🎉</p>
+          <p>You are all caught up! 🎉</p>
         )}
       </section>
 
-      {/* Action Buttons */}
+      {/* ===== Action Buttons ===== */}
       <div className="roadmap-actions">
         <button className="btn-edit">Edit Roadmap</button>
         <button className="btn-recommend">Get Skill Recommendation</button>

@@ -1,10 +1,12 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import "../styles/Dashboard.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Home, Target, BookOpen } from "lucide-react";
 import axios from "axios";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [roadmap, setRoadmap] = useState({
     completed: [],
@@ -28,9 +30,22 @@ const Dashboard = () => {
   }, []);
 
   const progress =
-    roadmap.completed.length /
-    (roadmap.completed.length + roadmap.upcoming.length + 1) *
+    (roadmap.completed.length /
+      (roadmap.completed.length + roadmap.upcoming.length + 1)) *
     100;
+
+  // === HANDLERS ===
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
+
+  const handleEditRoadmap = () => {
+    navigate("/roadmap");
+  };
+
+  const handleGetRecommendation = () => {
+    navigate("/recommendation");
+  };
 
   return (
     <div className="dashboard-container">
@@ -60,8 +75,8 @@ const Dashboard = () => {
           </Link>
         </nav>
 
-        <div className="profile">
-          <User size={22} />
+        <div className="profile" onClick={handleProfileClick}>
+          <User size={22} className="profile-icon" />
         </div>
       </header>
 
@@ -85,7 +100,12 @@ const Dashboard = () => {
                 You’re currently working on:{" "}
                 <strong>{roadmap.current.name || "Loading..."}</strong>
               </p>
-              <button className="continue-btn">Continue</button>
+              <button
+                className="continue-btn"
+                onClick={() => navigate("/roadmap")}
+              >
+                Continue
+              </button>
             </div>
           ) : (
             <p>No active skill in progress.</p>
@@ -119,8 +139,12 @@ const Dashboard = () => {
 
       {/* Bottom Buttons */}
       <footer className="dashboard-footer">
-        <button className="edit-btn">Edit Roadmap</button>
-        <button className="recommend-btn">Get Skill Recommendation</button>
+        <button className="edit-btn" onClick={handleEditRoadmap}>
+          Edit Roadmap
+        </button>
+        <button className="recommend-btn" onClick={handleGetRecommendation}>
+          Get Skill Recommendation
+        </button>
       </footer>
     </div>
   );

@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

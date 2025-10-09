@@ -1,23 +1,27 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Upload, MousePointerClick, Target } from "lucide-react";
 import "../styles/LandingPage.css";
+import ProgressImage from "../assets/ProgressRoadmap.jpeg";
 
 const LandingPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const currentYear = new Date().getFullYear();
   const navigate = useNavigate();
 
+  // Check auth status on mount
   useEffect(() => {
-    // Check authentication status (mock: check localStorage for a token)
     const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
   }, []);
 
+  // Real logout
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("user"); // optional, clears cached user info
     setIsAuthenticated(false);
-    navigate("/");
+    navigate("/"); // Redirect to home
   };
 
   return (
@@ -33,11 +37,24 @@ const LandingPage = () => {
           <nav className="nav-links">
             {isAuthenticated ? (
               <>
-                <Link to="/" className="nav-link">Home</Link>
-                <Link to="/dashboard" className="nav-link">Dashboard</Link>
-                <Link to="/roadmaps" className="nav-link">Roadmaps</Link>
-                <Link to="/skills" className="nav-link">Skills</Link>
-                <button onClick={handleLogout} className="btn-logout">Logout</button>
+                <Link to="/" className="nav-link">
+                  Home
+                </Link>
+                <Link to="/dashboard" className="nav-link">
+                  Dashboard
+                </Link>
+                <Link to="/roadmaps" className="nav-link">
+                  Roadmaps
+                </Link>
+                <Link to="/skills" className="nav-link">
+                  Skills
+                </Link>
+                <Link to="/profile" className="nav-link">
+                  Profile
+                </Link>
+                <button onClick={handleLogout} className="btn-logout">
+                  Logout
+                </button>
               </>
             ) : (
               <Link to="/auth" className="btn-primary">
@@ -57,8 +74,9 @@ const LandingPage = () => {
             <span>Education and Career</span>
           </h2>
           <p>
-            SkillBridge helps university students and graduates generate personalized learning roadmaps using AI. Our
-            platform provides a step-by-step guide to help you achieve your career goals.
+            SkillBridge helps university students and graduates generate
+            personalized learning roadmaps using AI. Our platform provides a
+            step-by-step guide to help you achieve your career goals.
           </p>
           <div className="hero-buttons">
             {!isAuthenticated ? (
@@ -78,10 +96,17 @@ const LandingPage = () => {
           </div>
         </div>
 
+        {/* FIXED IMAGE RENDERING */}
         <div className="hero-image">
           <img
-            src="../images/Progress Roadmap.jpeg"
-            alt="Student Illustration"
+            src={ProgressImage}
+            alt="Progress Roadmap"
+            loading="lazy"
+            style={{
+              borderRadius: "12px",
+              objectFit: "cover",
+              maxWidth: "100%",
+            }}
           />
         </div>
       </section>
@@ -95,19 +120,28 @@ const LandingPage = () => {
           <div className="step">
             <Upload className="icon" size={48} />
             <h4>1. Upload Resume</h4>
-            <p>Upload your resume to let our AI analyze your skills and experience.</p>
+            <p>
+              Upload your resume to let our AI analyze your skills and
+              experience.
+            </p>
           </div>
 
           <div className="step">
             <MousePointerClick className="icon" size={48} />
             <h4>2. Choose Skill</h4>
-            <p>Select the skill you want to learn or improve for your desired career path.</p>
+            <p>
+              Select the skill you want to learn or improve for your desired
+              career path.
+            </p>
           </div>
 
           <div className="step">
             <Target className="icon" size={48} />
             <h4>3. Get Roadmap</h4>
-            <p>Receive a personalized, step-by-step learning roadmap to achieve your goals.</p>
+            <p>
+              Receive a personalized, step-by-step learning roadmap to achieve
+              your goals.
+            </p>
           </div>
         </div>
       </section>
@@ -118,7 +152,8 @@ const LandingPage = () => {
           <div className="cta-text">
             <h3>Ready to get your personalized roadmap?</h3>
             <p>
-              Upload your resume and tell us the skill you want to master — we'll generate a step-by-step learning plan.
+              Upload your resume and tell us the skill you want to master —
+              we'll generate a step-by-step learning plan.
             </p>
           </div>
           <div className="cta-buttons">

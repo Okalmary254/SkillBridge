@@ -157,3 +157,68 @@
   color: #555;
   text-align: center;
 }
+
+/* ===== Navbar Styles ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 0.8rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo .dot {
+  width: 10px;
+  height: 10px;
+  background-color: #2563eb;
+  border-radius: 50%;
+}
+
+.logo h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+.nav-item.active,
+.nav-item:hover {
+  color: #2563eb;
+}
+
+.profile {
+  background: #eff6ff;
+  padding: 0.6rem;
+  border-radius: 50%;
+  color: #2563eb;
+  cursor: pointer;
+}
+.profile:hover {
+  background: #dbeafe;
+}
